@@ -3,7 +3,7 @@
  */
 async function api(path, options = {}) {
   const headers = new Headers(options.headers || {});
-  
+
   if (State.token) {
     headers.set("Authorization", `Bearer ${State.token}`);
   }
@@ -18,7 +18,7 @@ async function api(path, options = {}) {
   try {
     const response = await fetch(endpoint, { ...options, headers });
     const contentType = response.headers.get("content-type") || "";
-    
+
     let body;
     if (contentType.includes("application/json")) {
       body = await response.json();
@@ -27,8 +27,8 @@ async function api(path, options = {}) {
     }
 
     if (!response.ok) {
-      const errorMsg = (typeof body === "object" && body !== null && body.error) 
-        ? body.error 
+      const errorMsg = (typeof body === "object" && body !== null && body.error)
+        ? body.error
         : `Request failed with status code ${response.status}.`;
       throw new Error(errorMsg);
     }

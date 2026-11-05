@@ -93,7 +93,7 @@ const Auth = {
 
   updateUI() {
     const isLoggedIn = Boolean(State.user);
-    
+
     // Header controls
     const loginBtn = $("#header-login-btn");
     const registerBtn = $("#header-register-btn");

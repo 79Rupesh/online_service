@@ -110,7 +110,7 @@ const Dashboard = {
 
     try {
       const data = await api("/dashboard/me");
-      
+
       // Update Metrics
       const total = $("#metric-total-apps");
       const pending = $("#metric-pending-apps");
@@ -293,7 +293,7 @@ const Dashboard = {
     const applicantName = button.dataset.applicantName;
     const serviceName = button.dataset.serviceName;
     let docs = [];
-    try { docs = JSON.parse(button.dataset.docs || "[]"); } catch {}
+    try { docs = JSON.parse(button.dataset.docs || "[]"); } catch { }
 
     $("#review-modal-app-id").textContent = appId;
     $("#review-modal-applicant").textContent = applicantName;
