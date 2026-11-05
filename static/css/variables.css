@@ -1,0 +1,104 @@
+/* MP Suvidha: Centralized Design System Variables
+   Color Palette matching MP Suvidha Identity:
+   - Primary Navy Blue: #123B63
+   - Royal Blue: #1769AA
+   - Saffron Orange: #F4A340
+   - Teal Green: #168C83
+   - Light Background: #F5F8FC
+   - White: #FFFFFF
+   - Heading Text: #1F2937
+   - Body Text: #475569
+   - Muted Text: #64748B
+   - Border: #E2E8F0
+   - Success: #168C83
+   - Warning: #D97706
+   - Error: #DC2626
+*/
+
+:root {
+  /* Brand Primary Colors */
+  --primary-navy: #123B63;
+  --royal-blue: #1769AA;
+  --royal-blue-hover: #0F5389;
+  --saffron: #F4A340;
+  --saffron-hover: #D97706;
+  --saffron-light: #FEF3C7;
+  --teal: #168C83;
+  --teal-hover: #116B64;
+  --teal-light: #E6F4F2;
+
+  /* Surfaces & Backgrounds */
+  --bg-main: #F5F8FC;
+  --bg-alt: #FFFFFF;
+  --bg-card: #FFFFFF;
+  --bg-card-hover: #F8FAFC;
+  --bg-input: #FFFFFF;
+  --bg-subtle: #EEF3F8;
+  --bg-glass: rgba(255, 255, 255, 0.95);
+  --white: #FFFFFF;
+
+  /* Text Colors */
+  --text-heading: #1F2937;
+  --text-body: #475569;
+  --text-muted: #64748B;
+  --text-subtle: #94A3B8;
+
+  /* State & Feedback Colors */
+  --success: #168C83;
+  --success-bg: #E6F4F2;
+  --warning: #D97706;
+  --warning-bg: #FEF3C7;
+  --error: #DC2626;
+  --error-bg: #FEE2E2;
+  --info: #1769AA;
+  --info-bg: #EBF4FC;
+
+  /* Semantic Aliases for compatibility */
+  --blue: #1769AA;
+  --blue-hover: #123B63;
+  --blue-deep: #123B63;
+  --blue-glow: rgba(23, 105, 170, 0.15);
+  --blue-bg: #EBF4FC;
+  --saffron-glow: rgba(244, 163, 64, 0.2);
+  --saffron-bg: #FEF3C7;
+  --teal-glow: rgba(22, 140, 131, 0.15);
+  --teal-bg: #E6F4F2;
+  --navy: #123B63;
+  --ink: #1F2937;
+  --muted: #64748B;
+  --light-bg: #F5F8FC;
+
+  /* Borders & Dividers */
+  --border: #E2E8F0;
+  --border-focus: #1769AA;
+  --border-hover: #CBD5E1;
+
+  /* Typography */
+  --font-body: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-heading: "Manrope", "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+
+  /* Font Sizes */
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+  --text-4xl: 2.25rem;
+
+  /* Clean, Subtle Shadows (No glowing neon) */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.03);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.03);
+
+  /* Border Radii */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-full: 9999px;
+
+  /* Layout Constraint */
+  --container-max: 1200px;
+}

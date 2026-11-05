@@ -1,0 +1,723 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>JanSeva Connect · Project Presentation Poster</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Manrope:wght@700;800;900&family=JetBrains+Mono:wght@600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #070B19;
+      --bg-card: #0E162B;
+      --bg-card-alt: #131E38;
+      --border: rgba(255, 255, 255, 0.12);
+      --text-head: #F8FAFC;
+      --text-body: #CBD5E1;
+      --text-muted: #94A3B8;
+      --blue: #38BDF8;
+      --blue-glow: rgba(56, 189, 248, 0.35);
+      --saffron: #F59E0B;
+      --saffron-glow: rgba(245, 158, 11, 0.35);
+      --teal: #10B981;
+      --teal-glow: rgba(16, 185, 129, 0.35);
+      --radius: 12px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-body);
+      font-family: 'Inter', sans-serif;
+      line-height: 1.5;
+      padding: 2rem 1rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    /* Print / Action Bar */
+    .action-bar {
+      width: 100%;
+      max-width: 1100px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      padding: 0.75rem 1.25rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.6rem 1.25rem;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.875rem;
+      text-decoration: none;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.2s ease;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #0284C7 0%, #2563EB 100%);
+      color: #FFFFFF;
+      box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
+    }
+    .btn-primary:hover {
+      box-shadow: 0 6px 20px rgba(56, 189, 248, 0.6);
+      transform: translateY(-2px);
+    }
+
+    .btn-outline {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      color: var(--text-head);
+    }
+    .btn-outline:hover {
+      border-color: var(--blue);
+      color: var(--blue);
+    }
+
+    /* Main Poster Canvas (A3/Presentation Ratio) */
+    .poster-canvas {
+      width: 100%;
+      max-width: 1100px;
+      background: radial-gradient(ellipse at 50% 0%, #132448 0%, #080D1D 70%);
+      border: 2px solid rgba(56, 189, 248, 0.35);
+      border-radius: 20px;
+      padding: 2.5rem 3rem;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 35px rgba(56, 189, 248, 0.15);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .poster-canvas::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 6px;
+      background: linear-gradient(90deg, var(--blue) 0%, var(--saffron) 50%, var(--teal) 100%);
+    }
+
+    /* Header */
+    .poster-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 1.75rem;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+    }
+
+    .brand-emblem {
+      width: 68px;
+      height: 68px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, #0284C7 0%, #1D4ED8 100%);
+      color: #FFFFFF;
+      display: grid;
+      place-items: center;
+      font-size: 2.2rem;
+      font-weight: 900;
+      box-shadow: 0 0 25px rgba(56, 189, 248, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .brand-title {
+      font-family: 'Manrope', sans-serif;
+      font-size: 2.5rem;
+      font-weight: 900;
+      color: var(--text-head);
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+    }
+
+    .brand-title span {
+      background: linear-gradient(135deg, #38BDF8 0%, #818CF8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .brand-tagline {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--saffron);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-top: 4px;
+    }
+
+    .academic-meta-badge {
+      text-align: right;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border);
+      padding: 0.75rem 1.25rem;
+      border-radius: var(--radius);
+    }
+
+    .academic-meta-badge b {
+      display: block;
+      color: var(--blue);
+      font-size: 0.95rem;
+    }
+
+    .academic-meta-badge span {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    /* Grid Layouts */
+    .poster-grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+      margin-bottom: 1.75rem;
+    }
+
+    .poster-grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-bottom: 1.75rem;
+    }
+
+    .poster-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      position: relative;
+    }
+
+    .poster-card.featured {
+      border-color: rgba(56, 189, 248, 0.4);
+      background: linear-gradient(145deg, #0E1A36 0%, #080E20 100%);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4), 0 0 20px rgba(56, 189, 248, 0.1);
+    }
+
+    .card-label {
+      font-size: 0.75rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--blue);
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .card-title {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--text-head);
+      margin-bottom: 0.75rem;
+      line-height: 1.25;
+    }
+
+    .card-text {
+      font-size: 0.875rem;
+      color: var(--text-body);
+      line-height: 1.6;
+    }
+
+    /* 4-Pillars Showcase */
+    .pillar-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+      margin-top: 0.75rem;
+    }
+
+    .pillar-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      background: rgba(255, 255, 255, 0.03);
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .pillar-icon {
+      font-size: 1.35rem;
+      line-height: 1;
+    }
+
+    .pillar-info b {
+      display: block;
+      font-size: 0.95rem;
+      color: var(--text-head);
+    }
+
+    .pillar-info small {
+      color: var(--text-muted);
+      font-size: 0.8rem;
+    }
+
+    /* Timeline Stepper Box */
+    .timeline-strip {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      padding: 1.25rem 0.5rem 0.5rem;
+      margin-top: 0.5rem;
+    }
+
+    .timeline-strip::before {
+      content: "";
+      position: absolute;
+      top: 26px;
+      left: 30px;
+      right: 30px;
+      height: 2px;
+      background: rgba(255, 255, 255, 0.15);
+      z-index: 1;
+    }
+
+    .timeline-node {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 22%;
+    }
+
+    .node-bubble {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #0B132B;
+      border: 2px solid var(--blue);
+      color: var(--blue);
+      font-weight: 800;
+      font-size: 0.8rem;
+      display: grid;
+      place-items: center;
+      margin-bottom: 0.4rem;
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
+    }
+
+    .node-bubble.done {
+      background: var(--teal);
+      border-color: var(--teal);
+      color: #070B19;
+      box-shadow: 0 0 12px rgba(16, 185, 129, 0.5);
+    }
+
+    .node-text {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--text-head);
+      line-height: 1.2;
+    }
+
+    /* Tech Stack Badges */
+    .tech-pill-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 0.75rem;
+    }
+
+    .tech-pill {
+      background: rgba(56, 189, 248, 0.1);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      color: var(--blue);
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .tech-pill.gold {
+      background: rgba(245, 158, 11, 0.1);
+      border-color: rgba(245, 158, 11, 0.25);
+      color: var(--saffron);
+    }
+
+    .tech-pill.green {
+      background: rgba(16, 185, 129, 0.1);
+      border-color: rgba(16, 185, 129, 0.25);
+      color: #34D399;
+    }
+
+    /* Live Stat Bar */
+    .stat-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      padding: 1.25rem;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin-bottom: 1.75rem;
+      text-align: center;
+    }
+
+    .stat-metric {
+      font-family: 'Manrope', sans-serif;
+      font-size: 2rem;
+      font-weight: 900;
+      color: var(--blue);
+      line-height: 1;
+      text-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
+    }
+    .stat-metric.saffron { color: var(--saffron); text-shadow: 0 0 15px rgba(245, 158, 11, 0.4); }
+    .stat-metric.teal { color: #34D399; text-shadow: 0 0 15px rgba(16, 185, 129, 0.4); }
+
+    .stat-name {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-top: 0.35rem;
+    }
+
+    /* Footer / Student Project Credentials */
+    .poster-footer {
+      border-top: 1px solid var(--border);
+      padding-top: 1.25rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .student-team-meta {
+      display: flex;
+      gap: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .student-team-meta div b {
+      color: var(--text-head);
+      display: block;
+      font-size: 0.9rem;
+    }
+
+    /* Print Optimizations */
+    @media print {
+      body {
+        background: #0B1120 !important;
+        padding: 0 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      .action-bar {
+        display: none !important;
+      }
+      .poster-canvas {
+        max-width: 100% !important;
+        border: none !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        padding: 1.5cm !important;
+      }
+    }
+
+    @media (max-width: 850px) {
+      .poster-grid-3, .poster-grid-2, .stat-row {
+        grid-template-columns: 1fr;
+      }
+      .poster-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .academic-meta-badge {
+        text-align: left;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Action Bar (hidden when printing) -->
+  <div class="action-bar">
+    <div>
+      <b style="color:var(--text-head)">JanSeva Connect Poster</b>
+      <small style="color:var(--text-muted); margin-left:8px">Ready for College Viva & Exhibition</small>
+    </div>
+    <div style="display:flex; gap:0.75rem; flex-wrap:wrap">
+      <a href="/" class="btn btn-outline">← Back to Portal</a>
+      <a href="{{ url_for('static', filename='images/janseva_poster.jpg') }}" target="_blank" class="btn btn-outline" download="JanSeva_Connect_Poster.jpg">
+        📥 Download Poster Image (HD)
+      </a>
+      <button class="btn btn-primary" onclick="window.print()">🖨️ Print Poster / Save as PDF</button>
+    </div>
+  </div>
+
+  <!-- Graphic Poster Showcase Card (Collapsible) -->
+  <div style="width:100%; max-width:1100px; margin-bottom:1.5rem; background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); padding:1.25rem; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem">
+    <div style="display:flex; align-items:center; gap:1rem">
+      <img src="{{ url_for('static', filename='images/janseva_poster.jpg') }}" alt="Poster Preview Thumbnail" style="width:70px; height:90px; object-fit:cover; border-radius:8px; border:1px solid rgba(56,189,248,0.4); box-shadow:0 0 15px rgba(56,189,248,0.3)">
+      <div>
+        <b style="color:var(--text-head); font-size:1.05rem; display:block">AI-Rendered Academic Exhibition Poster (HD Graphic)</b>
+        <small style="color:var(--text-muted)">High-resolution 300 DPI graphic with glowing cyber-gov digital gateway and visual cards.</small>
+      </div>
+    </div>
+    <div style="display:flex; gap:0.5rem">
+      <a href="{{ url_for('static', filename='images/janseva_poster.jpg') }}" target="_blank" class="btn btn-primary btn-sm">
+        🔍 View Full Graphic ↗
+      </a>
+    </div>
+  </div>
+
+  <!-- Main Poster Canvas -->
+  <div class="poster-canvas">
+
+    <!-- Header Section -->
+    <header class="poster-header">
+      <div class="brand-group">
+        <div class="brand-emblem">J</div>
+        <div>
+          <div class="brand-title">JanSeva <span>Connect</span></div>
+          <div class="brand-tagline">Digital Services, Simplified</div>
+        </div>
+      </div>
+      <div class="academic-meta-badge">
+        <b>BCA / B.Tech Major/Mini Project</b>
+        <span>Unit 5: Evaluation of Local E-Governance Portals</span>
+        <div style="color:#34D399; font-weight:700; font-size:0.75rem; margin-top:2px">● Inspired by MP e-Services</div>
+      </div>
+    </header>
+
+    <!-- Project Abstract & Live Numbers -->
+    <div class="poster-grid-2">
+      <div class="poster-card featured">
+        <div class="card-label">🏛 Project Vision & Purpose</div>
+        <div class="card-title">Transforming Public Service Delivery</div>
+        <p class="card-text">
+          <b>JanSeva Connect</b> is a centralized, digital e-governance platform providing transparent access to citizen services. Inspired by Madhya Pradesh's <b>MP e-Services</b> (<code>services.mp.gov.in</code>), it replaces physical paperwork with automated online workflows, real-time tracking, digital certificate issuance, and an academic evaluation system.
+        </p>
+      </div>
+
+      <div class="poster-card">
+        <div class="card-label">⚡ System Architecture & Technology</div>
+        <div class="card-title">Clean, Zero-Build Stack</div>
+        <p class="card-text" style="margin-bottom:0.75rem">
+          Engineered without heavy Node build tools for maximum portability, security, and lightning execution on any machine.
+        </p>
+        <div class="tech-pill-wrap">
+          <span class="tech-pill">Python 3.10+</span>
+          <span class="tech-pill">Flask REST API</span>
+          <span class="tech-pill gold">SQLite 3 (ACID)</span>
+          <span class="tech-pill green">Pure JS (ES6+)</span>
+          <span class="tech-pill">Cyber Dark CSS3</span>
+          <span class="tech-pill gold">In-Memory PDF 1.4</span>
+          <span class="tech-pill green">PBKDF2 Password Hashing</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Live Performance Metrics -->
+    <div class="stat-row">
+      <div>
+        <div class="stat-metric">17+</div>
+        <div class="stat-name">Active Public Services</div>
+      </div>
+      <div>
+        <div class="stat-metric saffron">12</div>
+        <div class="stat-name">Government Departments</div>
+      </div>
+      <div>
+        <div class="stat-metric teal">4-Stage</div>
+        <div class="stat-name">Live Timeline Tracking</div>
+      </div>
+      <div>
+        <div class="stat-metric">100%</div>
+        <div class="stat-name">Permanent Dark Mode</div>
+      </div>
+    </div>
+
+    <!-- Core Functional Pillars (3 Columns) -->
+    <div class="poster-grid-3">
+
+      <!-- Col 1: Citizen Services -->
+      <div class="poster-card">
+        <div class="card-label">📜 Citizen Services</div>
+        <div class="card-title">Unified Service Catalogue</div>
+        <p class="card-text" style="font-size:0.8rem">
+          Searchable catalogue covering certificates, scholarships, revenue, municipal, and pension services with instant eligibility checklists.
+        </p>
+        <ul class="pillar-list">
+          <li class="pillar-item">
+            <span class="pillar-icon">🎓</span>
+            <div class="pillar-info">
+              <b>Education & Scholarships</b>
+              <small>Post-Matric & Higher Grants</small>
+            </div>
+          </li>
+          <li class="pillar-item">
+            <span class="pillar-icon">📜</span>
+            <div class="pillar-info">
+              <b>Certificates & Licenses</b>
+              <small>Income, Caste, Domicile</small>
+            </div>
+          </li>
+          <li class="pillar-item">
+            <span class="pillar-icon">🏙</span>
+            <div class="pillar-info">
+              <b>Municipal Connections</b>
+              <small>Water, Trade, Property Tax</small>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Col 2: Tracking & Verification -->
+      <div class="poster-card">
+        <div class="card-label">🔍 Live Verification</div>
+        <div class="card-title">Transparency & Tracking</div>
+        <p class="card-text" style="font-size:0.8rem">
+          End-to-end audit trail. Citizens track applications using Application ID and registered contact without sharing sensitive info.
+        </p>
+
+        <!-- Stepper Preview -->
+        <div class="timeline-strip">
+          <div class="timeline-node">
+            <div class="node-bubble done">✓</div>
+            <div class="node-text">Submitted</div>
+          </div>
+          <div class="timeline-node">
+            <div class="node-bubble done">✓</div>
+            <div class="node-text">Review</div>
+          </div>
+          <div class="timeline-node">
+            <div class="node-bubble">3</div>
+            <div class="node-text">Verify</div>
+          </div>
+          <div class="timeline-node">
+            <div class="node-bubble">4</div>
+            <div class="node-text">Issued</div>
+          </div>
+        </div>
+
+        <div style="background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.3); border-radius:8px; padding:0.6rem 0.85rem; margin-top:1.25rem; font-size:0.8rem; color:#34D399">
+          <b>🛡 Simulated Certificate Verification:</b> Generates and validates official PDF certificate proofs instantly.
+        </div>
+      </div>
+
+      <!-- Col 3: Syllabus Unit 5 Evaluation Module -->
+      <div class="poster-card featured">
+        <div class="card-label">📊 Syllabus Unit 5 Module</div>
+        <div class="card-title">Portal Usability Rubric</div>
+        <p class="card-text" style="font-size:0.8rem">
+          Comprehensive academic research module designed specifically for course syllabus requirements.
+        </p>
+        <ul class="pillar-list">
+          <li class="pillar-item">
+            <span class="pillar-icon">⭐</span>
+            <div class="pillar-info">
+              <b>10 Standardized Criteria</b>
+              <small>Accessibility, Latency, UI (1-5)</small>
+            </div>
+          </li>
+          <li class="pillar-item">
+            <span class="pillar-icon">👥</span>
+            <div class="pillar-info">
+              <b>Student Group Collaboration</b>
+              <small>Task distribution & team board</small>
+            </div>
+          </li>
+          <li class="pillar-item">
+            <span class="pillar-icon">📑</span>
+            <div class="pillar-info">
+              <b>13-Point PDF Report</b>
+              <small>Instant print-ready viva report</small>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+    </div>
+
+    <!-- Security, RBAC & Workflows -->
+    <div class="poster-grid-2">
+      <div class="poster-card">
+        <div class="card-label">🔐 Security & Governance</div>
+        <div class="card-title">Three-Tier Role-Based Access Control</div>
+        <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:0.75rem; margin-top:0.75rem; text-align:center">
+          <div style="background:rgba(56,189,248,0.08); border:1px solid rgba(56,189,248,0.2); padding:0.75rem 0.5rem; border-radius:8px">
+            <b style="color:var(--blue); font-size:0.85rem; display:block">Citizen</b>
+            <small style="color:var(--text-muted); font-size:0.75rem">Apply, Track, Download</small>
+          </div>
+          <div style="background:rgba(245,158,11,0.08); border:1px solid rgba(245,158,11,0.2); padding:0.75rem 0.5rem; border-radius:8px">
+            <b style="color:var(--saffron); font-size:0.85rem; display:block">Officer</b>
+            <small style="color:var(--text-muted); font-size:0.75rem">Verify, Remarks, Approve</small>
+          </div>
+          <div style="background:rgba(16,185,129,0.08); border:1px solid rgba(16,185,129,0.2); padding:0.75rem 0.5rem; border-radius:8px">
+            <b style="color:#34D399; font-size:0.85rem; display:block">Admin</b>
+            <small style="color:var(--text-muted); font-size:0.75rem">RBAC, Catalog, Analytics</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="poster-card">
+        <div class="card-label">💡 Key Innovations</div>
+        <div class="card-title">Zero-Dependency PDF Engine</div>
+        <p class="card-text">
+          Built-in pure Python PDF generator that builds standard <b>PDF 1.4 documents</b> in memory without relying on external web rendering services or heavy binaries. Produces both verified citizen certificates and multi-page structured academic evaluation reports.
+        </p>
+      </div>
+    </div>
+
+    <!-- Poster Footer (Student Credentials & Presentation Info) -->
+    <footer class="poster-footer">
+      <div class="student-team-meta">
+        <div>
+          <span>Project Developed By:</span>
+          <b>Student Evaluation Team</b>
+        </div>
+        <div>
+          <span>Course / Subject:</span>
+          <b>Web Technologies & E-Governance (Unit 5)</b>
+        </div>
+        <div>
+          <span>Framework & Language:</span>
+          <b>Python Flask · SQLite 3 · HTML5 / CSS3 / ES6</b>
+        </div>
+      </div>
+      <div style="text-align:right">
+        <span style="color:var(--blue); font-weight:700">JanSeva Connect Portal</span>
+        <div style="color:var(--text-muted); font-size:0.75rem">Digital Services, Simplified · 2026 Academic Demo</div>
+      </div>
+    </footer>
+
+  </div>
+
+</body>
+</html>

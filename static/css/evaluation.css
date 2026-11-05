@@ -1,0 +1,323 @@
+/* JanSeva Connect: College Syllabus Unit 5 Evaluation Module in Dark Mode */
+
+.evaluation-hero-banner {
+  background: radial-gradient(ellipse at 50% 0%, #173366 0%, #0D1933 100%);
+  color: var(--text-heading);
+  padding: 3rem 0;
+  border-radius: var(--radius-lg);
+  margin-bottom: 2.5rem;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5), 0 0 25px rgba(56, 189, 248, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.evaluation-hero-inner {
+  padding: 0 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.eval-badge-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.eval-syllabus-pill {
+  background-color: var(--saffron);
+  color: #0B132B;
+  font-weight: 800;
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.35);
+}
+
+.evaluation-hero-inner h2 {
+  color: var(--text-heading);
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.evaluation-hero-inner p {
+  color: #94A3B8;
+  font-size: var(--text-base);
+  max-width: 600px;
+  margin: 0;
+}
+
+/* Evaluation Layout Grid */
+.eval-layout-grid {
+  display: grid;
+  grid-template-columns: 1.7fr 0.9fr;
+  gap: 2rem;
+  align-items: start;
+}
+
+.eval-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 2rem;
+}
+
+.eval-card-header {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 1rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.eval-card-header h3 {
+  font-size: 1.35rem;
+  color: var(--text-heading);
+  margin: 0;
+}
+
+/* 10 Criteria Rating Grid in Dark Mode */
+.criteria-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.criterion-item {
+  background-color: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-md);
+  padding: 0.85rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.criterion-item:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-color: rgba(56, 189, 248, 0.3);
+}
+
+.criterion-title {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  color: var(--text-heading);
+}
+
+.criterion-ratings {
+  display: flex;
+  gap: 0.35rem;
+}
+
+.crit-btn {
+  flex: 1;
+  height: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background-color: rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 700;
+  color: #CBD5E1;
+  display: grid;
+  place-items: center;
+  transition: all 0.15s ease;
+}
+
+.crit-btn:hover {
+  border-color: var(--blue);
+  color: var(--blue);
+  box-shadow: 0 0 8px rgba(56, 189, 248, 0.3);
+}
+
+.crit-btn.selected {
+  background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+  border-color: #F59E0B;
+  color: #0B132B;
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.5);
+}
+
+/* Report Checklist Card */
+.report-feature-box {
+  background: linear-gradient(135deg, #0F1E3D 0%, #0A1428 100%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--text-heading);
+  border-radius: var(--radius-lg);
+  padding: 1.75rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+}
+
+.report-feature-box h4 {
+  color: var(--text-heading);
+  font-size: 1.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.report-feature-box p {
+  color: #94A3B8;
+  font-size: var(--text-sm);
+  margin-bottom: 1.25rem;
+}
+
+.report-checklist {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.report-checklist li {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  font-size: var(--text-xs);
+  color: #CBD5E1;
+}
+
+.check-mark {
+  color: #34D399;
+  font-weight: 800;
+  text-shadow: 0 0 8px #34D399;
+}
+
+/* Evaluation Records Cards */
+.saved-eval-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+}
+
+.saved-eval-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.25s ease;
+}
+
+.saved-eval-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(56, 189, 248, 0.4);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5), 0 0 15px rgba(56, 189, 248, 0.15);
+}
+
+.saved-eval-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.eval-score-chip {
+  background-color: rgba(16, 185, 129, 0.15);
+  color: #34D399;
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  font-weight: 800;
+  font-size: 12px;
+  padding: 3px 8px;
+  border-radius: var(--radius-full);
+}
+
+.saved-eval-card h4 {
+  font-size: 1.1rem;
+  color: var(--text-heading);
+  margin-bottom: 0.35rem;
+}
+
+.saved-eval-card p {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin-bottom: 1rem;
+  flex: 1;
+}
+
+/* Group Management & Discussions */
+.group-card-item {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+  transition: border-color 0.2s ease;
+}
+
+.group-card-item:hover {
+  border-color: rgba(56, 189, 248, 0.3);
+}
+
+.group-progress-bar {
+  height: 6px;
+  background-color: rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  margin: 0.75rem 0;
+}
+
+.group-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #38BDF8 0%, #10B981 100%);
+  border-radius: var(--radius-full);
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
+}
+
+.discussion-feed {
+  max-height: 280px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 0.5rem 0;
+  margin-bottom: 1rem;
+}
+
+.discussion-message {
+  background-color: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-md);
+  padding: 0.75rem 1rem;
+}
+
+.discussion-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-bottom: 0.25rem;
+}
+
+.discussion-meta b {
+  color: var(--blue);
+}
+
+.discussion-message p {
+  margin: 0;
+  font-size: var(--text-xs);
+  color: var(--text-body);
+}
+
+@media (max-width: 1024px) {
+  .eval-layout-grid {
+    grid-template-columns: 1fr;
+  }
+  .criteria-container {
+    grid-template-columns: 1fr;
+  }
+  .saved-eval-grid {
+    grid-template-columns: 1fr;
+  }
+}
