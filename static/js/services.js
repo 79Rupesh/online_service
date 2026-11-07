@@ -39,14 +39,17 @@ const Services = {
           return `
             <div class="cat-card" data-category-click="${escapeHtml(cat.name)}">
               <div class="cat-card-header">
-                <span class="cat-icon-badge">${cat.icon || this.getCategoryIcon(cat.name)}</span>
-                <span class="cat-card-title">${escapeHtml(catName)}</span>
+                <div class="cat-icon-badge">${cat.icon || this.getCategoryIcon(cat.name)}</div>
+                <div>
+                  <div class="cat-card-title">${escapeHtml(catName)}</div>
+                  <div style="font-size:11px; font-weight:700; color:var(--royal-blue); margin-top:2px">${serviceCountText}</div>
+                </div>
               </div>
               <div class="cat-card-desc">${escapeHtml(catDesc)}</div>
               <div class="cat-card-footer">
-                <span>${serviceCountText}</span>
-                <span style="display:inline-flex; align-items:center; gap:0.35rem; color:var(--royal-blue); font-weight:700">
-                  ${isHi ? "सेवाएँ देखें" : "Explore"} &rarr;
+                <span style="font-size:11px; color:var(--text-muted); font-weight:600">MP Digital Cluster</span>
+                <span style="display:inline-flex; align-items:center; gap:0.35rem; color:var(--royal-blue); font-weight:700; font-size:12px">
+                  ${isHi ? "सेवाएँ देखें" : "Explore Services"} &rarr;
                 </span>
               </div>
             </div>
@@ -176,8 +179,8 @@ const Services = {
               <div class="service-card">
                 <div>
                   <div class="service-card-top">
-                    <span class="service-dept-badge">${escapeHtml(svcDept)}</span>
-                    <span class="service-fee-badge">${escapeHtml(svcFee)}</span>
+                    <span class="service-dept-badge">🏛️ ${escapeHtml(svcDept)}</span>
+                    <span class="service-fee-badge">₹ ${escapeHtml(svcFee)}</span>
                   </div>
                   <div class="service-card-title">${escapeHtml(svcName)}</div>
                   <div class="service-card-desc">${escapeHtml(svcDesc)}</div>
@@ -186,17 +189,17 @@ const Services = {
                 <div>
                   <div class="service-card-meta">
                     <div>
-                      <span class="meta-item-label">${I18N.t("serv_time_label")}</span>
+                      <span class="meta-item-label">⏱️ ${I18N.t("serv_time_label")}</span>
                       <div class="meta-item-val">${escapeHtml(svcTime)}</div>
                     </div>
                     <div>
-                      <span class="meta-item-label">${I18N.t("nav_categories")}:</span>
+                      <span class="meta-item-label">📁 ${I18N.t("nav_categories")}</span>
                       <div class="meta-item-val">${escapeHtml(svcCat)}</div>
                     </div>
                   </div>
 
                   <div class="service-card-actions">
-                    <button class="btn btn-primary btn-sm" data-apply-svc="${escapeHtml(svc.id)}">${I18N.t("btn_apply_now")} ↗</button>
+                    <button class="btn btn-primary btn-sm" data-apply-svc="${escapeHtml(svc.id)}">${I18N.t("btn_apply_now")} &rarr;</button>
                     <button class="btn btn-outline btn-sm" data-details-svc="${escapeHtml(svc.id)}">${I18N.t("btn_view_details")}</button>
                   </div>
                 </div>

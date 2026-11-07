@@ -31,8 +31,8 @@ const Dashboard = {
           <div class="service-card">
             <div>
               <div class="service-card-top">
-                <span class="service-dept-badge">${escapeHtml(svcDept)}</span>
-                <span class="badge badge-saffron">★ ${isHi ? "लोकप्रिय" : "Popular"}</span>
+                <span class="service-dept-badge">🏛️ ${escapeHtml(svcDept)}</span>
+                <span class="badge badge-saffron">★ ${isHi ? "लोकप्रिय सेवा" : "Most Requested"}</span>
               </div>
               <div class="service-card-title">${escapeHtml(svcName)}</div>
               <div class="service-card-desc">${isHi ? "त्वरित समीक्षा एवं डिजिटल प्रमाणन हेतु सर्वाधिक अनुरोध की जाने वाली सेवा।" : "Frequently requested citizen service with expedited review workflows."}</div>
@@ -40,16 +40,16 @@ const Dashboard = {
             <div>
               <div class="service-card-meta">
                 <div>
-                  <span class="meta-item-label">${I18N.t("nav_categories")}:</span>
+                  <span class="meta-item-label">📁 ${I18N.t("nav_categories")}</span>
                   <div class="meta-item-val">${escapeHtml(svcCat)}</div>
                 </div>
                 <div>
-                  <span class="meta-item-label">${isHi ? "कुल आवेदन" : "Applications"}:</span>
+                  <span class="meta-item-label">📊 ${isHi ? "कुल आवेदन" : "Applications"}</span>
                   <div class="meta-item-val">${svc.application_count} ${isHi ? "प्रस्तुत" : "Submitted"}</div>
                 </div>
               </div>
               <div class="service-card-actions">
-                <button class="btn btn-primary btn-sm" data-apply-svc="${escapeHtml(svc.id)}">${I18N.t("btn_apply_now")} ↗</button>
+                <button class="btn btn-primary btn-sm" data-apply-svc="${escapeHtml(svc.id)}">${I18N.t("btn_apply_now")} &rarr;</button>
                 <button class="btn btn-outline btn-sm" data-details-svc="${escapeHtml(svc.id)}">${I18N.t("btn_view_details")}</button>
               </div>
             </div>

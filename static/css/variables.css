@@ -87,11 +87,24 @@
   --text-3xl: 1.875rem;
   --text-4xl: 2.25rem;
 
-  /* Clean, Subtle Shadows (No glowing neon) */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.04);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.03);
-  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.03);
+  /* Clean, Subtle & Elevated Shadows */
+  --shadow-xs: 0 1px 2px rgba(18, 59, 99, 0.05);
+  --shadow-sm: 0 2px 5px rgba(18, 59, 99, 0.06);
+  --shadow-md: 0 6px 18px -3px rgba(18, 59, 99, 0.09), 0 2px 6px -1px rgba(0, 0, 0, 0.03);
+  --shadow-lg: 0 14px 28px -4px rgba(18, 59, 99, 0.12), 0 4px 10px -2px rgba(0, 0, 0, 0.04);
+  --shadow-xl: 0 24px 48px -8px rgba(18, 59, 99, 0.16), 0 8px 16px -4px rgba(0, 0, 0, 0.05);
+  --shadow-card: 0 4px 20px -2px rgba(18, 59, 99, 0.07);
+  --shadow-card-hover: 0 20px 38px -6px rgba(18, 59, 99, 0.15), 0 8px 16px -4px rgba(0, 0, 0, 0.04);
+
+  /* Modern Vibrant Gradients */
+  --grad-primary: linear-gradient(135deg, #1769AA 0%, #123B63 100%);
+  --grad-saffron: linear-gradient(135deg, #F4A340 0%, #D97706 100%);
+  --grad-teal: linear-gradient(135deg, #168C83 0%, #0F6B64 100%);
+  --grad-royal: linear-gradient(135deg, #1E88E5 0%, #1565C0 100%);
+  --grad-purple: linear-gradient(135deg, #8B5CF6 0%, #6D28D9 100%);
+  --grad-coral: linear-gradient(135deg, #F43F5E 0%, #BE123C 100%);
+  --grad-emerald: linear-gradient(135deg, #10B981 0%, #047857 100%);
+  --grad-banner: linear-gradient(90deg, #1769AA 0%, #F4A340 50%, #168C83 100%);
 
   /* Border Radii */
   --radius-sm: 6px;

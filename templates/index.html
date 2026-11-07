@@ -162,19 +162,21 @@
       <!-- SECTION A: HERO SECTION -->
       <section class="hero-section" id="home">
         <div class="container">
-          <div class="hero-eyebrow" data-i18n="hero_eyebrow">One Portal. Multiple Services.</div>
+          <div class="hero-eyebrow">
+            <span class="pulse-dot"></span>
+            <span data-i18n="hero_eyebrow">One Portal. Multiple Services.</span>
+          </div>
           <h1 class="hero-title" data-i18n="hero_title">
             All Essential Services, <span>One Digital Platform</span>
           </h1>
           <p class="hero-subtitle" data-i18n="hero_subtitle">
-            Discover services, understand eligibility, submit applications and track your progress through one
-            convenient
-            platform.
+            Discover services, understand eligibility, submit applications and track your progress through one convenient platform.
           </p>
 
           <!-- Hero Search Form -->
           <div class="hero-search-wrapper">
             <form class="hero-search-form" id="hero-search-form" role="search" aria-label="Search all services">
+              <span class="hero-search-icon">🔍</span>
               <input type="search" class="hero-search-input" id="hero-search-input"
                 data-i18n-placeholder="hero_search_placeholder"
                 placeholder="Search for services, certificates, or departments..." autocomplete="off">
@@ -199,11 +201,26 @@
           </div>
 
           <div style="margin-top:2rem; display:flex; gap:1rem; justify-content:center; flex-wrap:wrap">
-            <a href="#services" class="btn btn-primary" data-nav="services" data-i18n="btn_explore_services">Explore
-              Services</a>
+            <a href="#services" class="btn btn-primary" data-nav="services" data-i18n="btn_explore_services">Explore Services &rarr;</a>
             <button type="button" class="btn btn-secondary"
               onclick="Router.navigateTo('home'); document.getElementById('process-section').scrollIntoView();"
               data-i18n="btn_how_it_works">How It Works</button>
+          </div>
+
+          <!-- Trust Badges Strip -->
+          <div class="hero-trust-strip">
+            <div class="trust-item">
+              <span class="trust-icon">⚡</span>
+              <span class="trust-text"><b>Fast-Track Processing</b> &bull; त्वरित डिजिटल सेवा</span>
+            </div>
+            <div class="trust-item">
+              <span class="trust-icon">🔒</span>
+              <span class="trust-text"><b>100% Paperless</b> &bull; सुरक्षित एवं पारदर्शी</span>
+            </div>
+            <div class="trust-item">
+              <span class="trust-icon">📜</span>
+              <span class="trust-text"><b>QR Sealed Documents</b> &bull; डिजिटल मुहर प्रमाण पत्र</span>
+            </div>
           </div>
         </div>
       </section>
@@ -218,6 +235,7 @@
                 <div class="quick-title" data-i18n="quick_apply">Apply for a Service</div>
                 <div class="quick-desc" data-i18n="quick_apply_desc">Discover eligibility and apply online</div>
               </div>
+              <div class="quick-arrow">&rarr;</div>
             </a>
 
             <a href="#tracking" class="quick-card" data-nav="tracking">
@@ -226,6 +244,7 @@
                 <div class="quick-title" data-i18n="quick_track">Track Application</div>
                 <div class="quick-desc" data-i18n="quick_track_desc">Real-time application status</div>
               </div>
+              <div class="quick-arrow">&rarr;</div>
             </a>
 
             <a href="#verify" class="quick-card" data-nav="verify">
@@ -234,6 +253,7 @@
                 <div class="quick-title" data-i18n="quick_verify">Verify Certificate</div>
                 <div class="quick-desc" data-i18n="quick_verify_desc">Check demo certificate validity</div>
               </div>
+              <div class="quick-arrow">&rarr;</div>
             </a>
 
             <a href="#categories" class="quick-card" data-nav="categories">
@@ -242,6 +262,7 @@
                 <div class="quick-title" data-i18n="quick_categories">Explore Categories</div>
                 <div class="quick-desc" data-i18n="quick_categories_desc">12 Citizen Service Clusters</div>
               </div>
+              <div class="quick-arrow">&rarr;</div>
             </a>
           </div>
         </div>
