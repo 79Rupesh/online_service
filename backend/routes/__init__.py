@@ -1,2 +1,1 @@
-"""Flask Blueprints package for JanSeva Connect routes."""
-
+"""Flask Blueprints package for MP Suvidha routes."""

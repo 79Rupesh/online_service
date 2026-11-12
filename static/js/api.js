@@ -1,5 +1,5 @@
 /**
- * JanSeva Connect: REST API Client
+ * MP Suvidha: REST API Client
  */
 async function api(path, options = {}) {
   const headers = new Headers(options.headers || {});

@@ -8,13 +8,22 @@ admin_bp = Blueprint("admin", __name__, url_prefix="/api")
 @admin_bp.get("/dashboard/stats")
 def public_stats():
     with connect_db() as db:
+        # Phase 7: Registered Citizens must strictly count only active citizen accounts, excluding admins & officers
+        active_services = db.execute("SELECT COUNT(DISTINCT id) FROM services WHERE availability='Available'").fetchone()[0] or 0
+        registered_citizens = db.execute("SELECT COUNT(DISTINCT id) FROM users WHERE role='citizen' AND active=1").fetchone()[0] or 0
+        total_applications = db.execute("SELECT COUNT(DISTINCT id) FROM applications").fetchone()[0] or 0
+        approved_applications = db.execute("SELECT COUNT(DISTINCT id) FROM applications WHERE status IN ('Approved', 'Completed')").fetchone()[0] or 0
+        pending_applications = db.execute("SELECT COUNT(DISTINCT id) FROM applications WHERE status IN ('Submitted', 'Under Review', 'Documents Required')").fetchone()[0] or 0
+        rejected_applications = db.execute("SELECT COUNT(DISTINCT id) FROM applications WHERE status='Rejected'").fetchone()[0] or 0
+
         stats = {
-            "services": db.execute("SELECT COUNT(*) FROM services WHERE availability='Available'").fetchone()[0],
-            "users": db.execute("SELECT COUNT(*) FROM users").fetchone()[0],
-            "applications": db.execute("SELECT COUNT(*) FROM applications").fetchone()[0],
-            "approved": db.execute("SELECT COUNT(*) FROM applications WHERE status IN ('Approved', 'Completed')").fetchone()[0],
-            "pending": db.execute("SELECT COUNT(*) FROM applications WHERE status IN ('Submitted', 'Under Review', 'Documents Required')").fetchone()[0],
-            "rejected": db.execute("SELECT COUNT(*) FROM applications WHERE status='Rejected'").fetchone()[0],
+            "services": active_services,
+            "users": registered_citizens,       # Primary display for Registered Citizens
+            "citizens": registered_citizens,
+            "applications": total_applications,
+            "approved": approved_applications,
+            "pending": pending_applications,
+            "rejected": rejected_applications,
         }
         popular = [
             row_dict(r) for r in db.execute(
@@ -85,7 +94,7 @@ def list_users():
     where_sql = (" WHERE " + " AND ".join(clauses)) if clauses else ""
     with connect_db() as db:
         rows = db.execute(
-            f"SELECT id, name, email, mobile, address, role, active, created_at FROM users{where_sql} ORDER BY created_at DESC LIMIT 100",
+            f"SELECT id, name, email, mobile, address, role, department, active, created_at FROM users{where_sql} ORDER BY created_at DESC LIMIT 100",
             params
         ).fetchall()
     return jsonify([row_dict(r) for r in rows])
@@ -95,6 +104,7 @@ def list_users():
 def update_user(user_id):
     data = request.get_json(silent=True) or {}
     role = str(data.get("role", "")).strip()
+    department = data.get("department")
     active = data.get("active")
 
     if role and role not in ("citizen", "officer", "admin"):
@@ -106,15 +116,17 @@ def update_user(user_id):
         return error("You cannot revoke your own administrator role or deactivate your own account.")
 
     with connect_db() as db:
-        user = db.execute("SELECT id FROM users WHERE id=?", (user_id,)).fetchone()
+        user = db.execute("SELECT id, role, department FROM users WHERE id=?", (user_id,)).fetchone()
         if not user:
             return error("User not found.", 404)
         if role:
             db.execute("UPDATE users SET role=? WHERE id=?", (role, user_id))
+        if department is not None:
+            db.execute("UPDATE users SET department=? WHERE id=?", (str(department).strip(), user_id))
         if active is not None:
             db.execute("UPDATE users SET active=? WHERE id=?", (int(active), user_id))
         updated = db.execute(
-            "SELECT id, name, email, mobile, address, role, active, created_at FROM users WHERE id=?",
+            "SELECT id, name, email, mobile, address, role, department, active, created_at FROM users WHERE id=?",
             (user_id,)
         ).fetchone()
 

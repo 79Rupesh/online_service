@@ -3,7 +3,7 @@
  * Madhya Pradesh Digital Services Portal
  */
 const I18N = {
-  currentLang: localStorage.getItem("mpsuvidha_lang") || localStorage.getItem("janseva_lang") || "en",
+  currentLang: localStorage.getItem("mpsuvidha_lang") || "en",
 
   // Localized dictionaries for dynamic database categories and departments
   categories: {
@@ -540,7 +540,7 @@ const I18N = {
     if (lang !== "en" && lang !== "hi") lang = "en";
     this.currentLang = lang;
     localStorage.setItem("mpsuvidha_lang", lang);
-    localStorage.setItem("janseva_lang", lang);
+    localStorage.removeItem("janseva_lang");
     document.documentElement.lang = lang;
 
     // Sync select dropdown

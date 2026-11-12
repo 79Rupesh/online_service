@@ -1,4 +1,4 @@
-"""Citizen and Stakeholder feedback and rating system routes."""
+"""Citizen and Stakeholder feedback, rating system, and privacy controls."""
 from flask import Blueprint, jsonify, request
 from backend.auth import auth_required, error
 from backend.database import connect_db, now_iso, row_dict
@@ -39,6 +39,7 @@ def submit_feedback():
 
 @feedback_bp.get("/feedback")
 def feedback_summary():
+    """Publicly safe aggregate feedback metrics. Personal information and complaints are strictly excluded."""
     with connect_db() as db:
         summary_row = db.execute(
             """SELECT
@@ -48,22 +49,33 @@ def feedback_summary():
                 ROUND(AVG(service_rating), 1) AS service
             FROM feedback"""
         ).fetchone()
-        summary = row_dict(summary_row)
+        summary = row_dict(summary_row) or {"total": 0, "average": 5.0, "ease": 5.0, "service": 5.0}
 
-        recent_rows = db.execute(
-            """SELECT id, name, stakeholder, portal_name, rating, ease_rating, service_rating, suggestions, complaint, created_at
-            FROM feedback ORDER BY id DESC LIMIT 8"""
-        ).fetchall()
+        # Safe ratings distribution breakdown without exposing private messages
+        distribution = {
+            star: db.execute("SELECT COUNT(*) FROM feedback WHERE rating=?", (star,)).fetchone()[0]
+            for star in (5, 4, 3, 2, 1)
+        }
 
     return jsonify({
         "summary": summary,
-        "items": [row_dict(r) for r in recent_rows]
+        "distribution": distribution
     })
 
 @feedback_bp.get("/admin/feedback")
 @auth_required("admin")
 def admin_feedback_list():
+    """Private, authorized administration review of detailed citizen feedback and complaints."""
     with connect_db() as db:
         rows = db.execute("SELECT * FROM feedback ORDER BY id DESC LIMIT 100").fetchall()
     return jsonify([row_dict(r) for r in rows])
 
+@feedback_bp.delete("/admin/feedback/<int:feedback_id>")
+@auth_required("admin")
+def admin_delete_feedback(feedback_id):
+    """Allows administrators to delete feedback entries."""
+    with connect_db() as db:
+        cur = db.execute("DELETE FROM feedback WHERE id=?", (feedback_id,))
+        if cur.rowcount == 0:
+            return error("Feedback entry not found.", 404)
+    return jsonify({"message": "Feedback record removed successfully."})

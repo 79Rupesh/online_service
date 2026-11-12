@@ -1,8 +1,8 @@
 /**
- * JanSeva Connect: State Management and Core UI Utilities
+ * MP Suvidha: State Management and Core UI Utilities
  */
 const State = {
-  token: localStorage.getItem("janseva_token") || "",
+  token: localStorage.getItem("mpsuvidha_token") || "",
   user: null,
   services: [],
   categories: [],

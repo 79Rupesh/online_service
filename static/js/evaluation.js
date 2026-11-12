@@ -1,5 +1,5 @@
 /**
- * JanSeva Connect: College Syllabus Unit 5 - Evaluation of Local E-Governance Portals
+ * MP Suvidha: Internal Demonstration Evaluation Module
  */
 const Evaluation = {
   criteria: [

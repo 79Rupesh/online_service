@@ -1,240 +1,272 @@
-"""PDF generator for MP Suvidha Demonstration Certificates and Service Reports.
-Built using standard PDF 1.4 specification with robust character handling.
+"""PDF generator for MP Suvidha: Madhya Pradesh Digital Services Portal.
+Supports real Unicode Devanagari (Hindi) and English typography, genuine QR code generation,
+and professional executive layout using Pillow and qrcode.
 """
+import io
+import os
 import textwrap
+from pathlib import Path
+from PIL import Image, ImageDraw, ImageFont
+import qrcode
 
-# Common Hindi to English transliteration map for graceful fallback in Type-1 fonts
-HINDI_CHAR_MAP = {
-    'अ': 'A', 'आ': 'Aa', 'इ': 'I', 'ई': 'Ee', 'उ': 'U', 'ऊ': 'Oo', 'ऋ': 'Ri',
-    'ए': 'E', 'ऐ': 'Ai', 'ओ': 'O', 'औ': 'Au', 'अं': 'An', 'अः': 'Ah',
-    'क': 'Ka', 'ख': 'Kha', 'ग': 'Ga', 'घ': 'Gha', 'ङ': 'Nga',
-    'च': 'Cha', 'छ': 'Chha', 'ज': 'Ja', 'झ': 'Jha', 'ञ': 'Nya',
-    'ट': 'Ta', 'ठ': 'Tha', 'ड': 'Da', 'ढ': 'Dha', 'ण': 'Na',
-    'त': 'Ta', 'थ': 'Tha', 'द': 'Da', 'ध': 'Dha', 'न': 'Na',
-    'प': 'Pa', 'फ': 'Pha', 'ब': 'Ba', 'भ': 'Bha', 'म': 'Ma',
-    'य': 'Ya', 'र': 'Ra', 'ल': 'La', 'व': 'Va', 'श': 'Sha',
-    'ष': 'Sha', 'स': 'Sa', 'ह': 'Ha', 'क्ष': 'Ksha', 'त्र': 'Tra', 'ज्ञ': 'Gya',
-    'ा': 'a', 'ि': 'i', 'ी': 'ee', 'ु': 'u', 'ू': 'oo', 'ृ': 'ri',
-    'े': 'e', 'ै': 'ai', 'ो': 'o', 'ौ': 'au', 'ं': 'n', '्': '',
-    '०': '0', '१': '1', '२': '2', '३': '3', '४': '4', '५': '5', '६': '6', '७': '7', '८': '8', '९': '9',
-    '₹': 'Rs.', '—': '-', '–': '-', '“': '"', '”': '"', '‘': "'", '’': "'", '•': '*'
-}
+ROOT_DIR = Path(__file__).resolve().parent.parent
 
-def clean_pdf_text(value: str) -> str:
-    """Sanitizes text to safe characters for Helvetica, transliterating Hindi characters gracefully."""
-    if not value:
-        return ""
-    val = str(value).replace("\r", " ").replace("\n", " ").replace("\t", " ")
-    
-    # Check if there are non-ASCII characters
-    res = []
-    for ch in val:
-        if ord(ch) < 128:
-            res.append(ch)
-        elif ch in HINDI_CHAR_MAP:
-            res.append(HINDI_CHAR_MAP[ch])
-        else:
-            # Fallback for unknown unicode
-            res.append(" ")
-    cleaned = "".join(res)
-    # Remove consecutive spaces
-    while "  " in cleaned:
-        cleaned = cleaned.replace("  ", " ")
-    return cleaned.strip()
-
-def pdf_escape(value: str) -> str:
-    """Escapes special PDF string characters: parentheses and backslashes."""
-    return clean_pdf_text(value).replace("\\", "\\\\").replace("(", "\\(").replace(")", "\\)")
-
-def generate_pdf_document(title: str, subtitle: str, entries: list[tuple[str, str]]) -> bytes:
-    """Builds a multi-page PDF document using standard PDF 1.4 specifications."""
-    rows: list[tuple[str, str]] = []
-    for kind, raw in entries:
-        val = clean_pdf_text(raw)
-        if kind in ("heading", "subheading", "badge", "spacer", "divider"):
-            rows.append((val, kind))
-        else:
-            wrapped = textwrap.wrap(val, width=86, break_long_words=True, break_on_hyphens=False) or [""]
-            rows.extend((line, "body") for line in wrapped)
-
-    pages: list[list[tuple[str, str]]] = []
-    current_page: list[tuple[str, str]] = []
-    y = 700
-
-    for row in rows:
-        val, kind = row
-        if kind == "heading":
-            height = 22
-        elif kind == "subheading":
-            height = 18
-        elif kind == "spacer":
-            height = 10
-        elif kind == "divider":
-            height = 8
-        elif kind == "badge":
-            height = 16
-        else:
-            height = 13
-
-        if y - height < 60 and current_page:
-            pages.append(current_page)
-            current_page = []
-            y = 700
-        current_page.append(row)
-        y -= height
-
-    if current_page or not pages:
-        pages.append(current_page)
-
-    num_pages = len(pages)
-    page_ids = [4 + 2 * i for i in range(num_pages)]
-    objects: list[bytes | None] = [None] * (4 + 2 * num_pages)
-    objects[1] = b"<< /Type /Catalog /Pages 2 0 R >>"
-    kids = " ".join(f"{pid} 0 R" for pid in page_ids)
-    objects[2] = f"<< /Type /Pages /Kids [{kids}] /Count {num_pages} >>".encode("ascii")
-    objects[3] = b"<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>"
-
-    for idx, page_rows in enumerate(pages):
-        page_id = 4 + idx * 2
-        stream_id = 5 + idx * 2
-
-        cmds = [
-            # Top Primary Navy Banner (#123B63 -> r:0.071, g:0.231, b:0.388)
-            "q 0.071 0.231 0.388 rg 0 760 595 82 re f Q",
-            # Saffron Orange Accent Bar (#F4A340 -> r:0.957, g:0.639, b:0.251)
-            "q 0.957 0.639 0.251 rg 0 756 595 4 re f Q",
-            # Brand Title
-            f"BT /F1 16 Tf 1 1 1 rg 40 802 Td ({pdf_escape('MP SUVIDHA · MADHYA PRADESH DIGITAL SERVICES')}) Tj ET",
-            f"BT /F1 9 Tf 0.92 0.95 0.98 rg 40 778 Td ({pdf_escape(subtitle or 'CITIZEN INFORMATION & DEMONSTRATION RECORD')}) Tj ET",
-            # Page Title
-            f"BT /F1 14 Tf 0.071 0.231 0.388 rg 40 730 Td ({pdf_escape(title)}) Tj ET",
-            "0.88 0.91 0.94 RG 40 716 m 555 716 l S",
-        ]
-
-        curr_y = 698
-        for value, kind in page_rows:
-            if kind == "spacer":
-                curr_y -= 8
-            elif kind == "divider":
-                cmds.append(f"0.88 0.91 0.94 RG 40 {curr_y} m 555 {curr_y} l S")
-                curr_y -= 6
-            elif kind == "heading":
-                curr_y -= 4
-                cmds.append(f"BT /F1 11 Tf 0.071 0.231 0.388 rg 40 {curr_y} Td ({pdf_escape(value)}) Tj ET")
-                curr_y -= 16
-            elif kind == "subheading":
-                cmds.append(f"BT /F1 10 Tf 0.09 0.41 0.66 rg 40 {curr_y} Td ({pdf_escape(value)}) Tj ET")
-                curr_y -= 14
-            elif kind == "badge":
-                cmds.append(f"BT /F1 9 Tf 0.086 0.549 0.514 rg 40 {curr_y} Td ({pdf_escape(value)}) Tj ET")
-                curr_y -= 13
-            else:
-                cmds.append(f"BT /F1 9 Tf 0.12 0.16 0.22 rg 40 {curr_y} Td ({pdf_escape(value)}) Tj ET")
-                curr_y -= 13
-
-        # Footer divider and disclaimer
-        cmds.extend([
-            "0.88 0.91 0.94 RG 40 42 m 555 42 l S",
-            f"BT /F1 8 Tf 0.40 0.46 0.52 rg 40 28 Td ({pdf_escape('MP Suvidha · Independent Demonstration Portal · Not affiliated with Government of MP')}) Tj ET",
-            f"BT /F1 8 Tf 0.40 0.46 0.52 rg 518 28 Td ({idx + 1} / {num_pages}) Tj ET",
-        ])
-
-        stream_bytes = "\n".join(cmds).encode("ascii")
-        objects[page_id] = f"<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R >> >> /Contents {stream_id} 0 R >>".encode("ascii")
-        objects[stream_id] = f"<< /Length {len(stream_bytes)} >>\nstream\n".encode("ascii") + stream_bytes + b"\nendstream"
-
-    # Assemble cross reference and trailer
-    output = bytearray(b"%PDF-1.4\n")
-    offsets = [0]
-    for obj_id in range(1, len(objects)):
-        offsets.append(len(output))
-        output.extend(f"{obj_id} 0 obj\n".encode("ascii"))
-        output.extend(objects[obj_id] or b"")
-        output.extend(b"\nendobj\n")
-
-    xref_offset = len(output)
-    output.extend(f"xref\n0 {len(objects)}\n0000000000 65535 f \n".encode("ascii"))
-    for offset in offsets[1:]:
-        output.extend(f"{offset:010d} 00000 n \n".encode("ascii"))
-    output.extend(f"trailer\n<< /Size {len(objects)} /Root 1 0 R >>\nstartxref\n{xref_offset}\n%%EOF".encode("ascii"))
-
-    return bytes(output)
+def get_unicode_font(size: int, bold: bool = False) -> ImageFont.FreeTypeFont | ImageFont.ImageFont:
+    """Attempts to load a Devanagari-compatible Unicode TrueType font, with graceful cross-platform fallbacks."""
+    candidate_paths = [
+        r"C:\Windows\Fonts\Nirmala.ttc",
+        r"C:\Windows\Fonts\nirmala.ttf",
+        r"C:\Windows\Fonts\mangal.ttf",
+        r"C:\Windows\Fonts\aparaj.ttf",
+        r"C:\Windows\Fonts\arial.ttf",
+        "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+        "/usr/share/fonts/truetype/freefont/FreeSans.ttf",
+        "/Library/Fonts/Arial Unicode.ttf",
+    ]
+    for path in candidate_paths:
+        if os.path.exists(path):
+            try:
+                # If TrueType collection (.ttc), index 0 is regular, 1 is bold
+                index = 1 if (bold and path.lower().endswith(".ttc")) else 0
+                return ImageFont.truetype(path, size=size, index=index)
+            except Exception:
+                try:
+                    return ImageFont.truetype(path, size=size)
+                except Exception:
+                    pass
+    return ImageFont.load_default()
 
 
 def build_certificate_pdf(cert: dict) -> bytes:
-    """Builds a formatted demo certificate document for MP Suvidha."""
-    entries = [
-        ("badge", "★ DEMONSTRATION RECORD · SIMULATED E-GOVERNANCE CERTIFICATE ★"),
-        ("spacer", ""),
-        ("body", "This is to certify that the following citizen application has been verified"),
-        ("body", "and approved within the MP Suvidha Madhya Pradesh Digital Services Portal:"),
-        ("spacer", ""),
-        ("heading", f"ISSUED TO:  {cert.get('applicant_name', 'Applicant Name')}"),
-        ("divider", ""),
-        ("subheading", f"Service Name:           {cert.get('service_name', 'N/A')}"),
-        ("body",       f"Certificate Number:     {cert.get('number', 'N/A')}"),
-        ("body",       f"Issuing Department:     {cert.get('department', 'N/A')}"),
-        ("body",       f"Date of Issue:          {cert.get('issue_date', 'N/A')}"),
-        ("body",       f"Application ID:         {cert.get('application_id', 'N/A')}"),
-        ("body",       f"Verification Status:    {cert.get('status', 'Valid')} (Demo Registered)"),
-        ("spacer", ""),
-        ("divider", ""),
-        ("heading", "Demonstration Record Declaration"),
-        ("body", "1. This certificate is digitally generated as an informational demonstration workflow showcasing citizen service delivery."),
-        ("body", "2. It exhibits complete end-to-end citizen application lifecycle: online submission, document review, officer verification, and automated certificate issuance."),
-        ("body", "3. Certificate authenticity can be verified anytime on MP Suvidha via the Certificate Verification module."),
-        ("spacer", ""),
-        ("body", "DISCLAIMER: This certificate is created strictly for demonstration purposes on MP Suvidha and holds no legal, administrative, or statutory validity with the Government of Madhya Pradesh or any official agency."),
+    """Generates an executive, print-ready A4 demonstration certificate PDF
+
+    with full Devanagari Hindi text rendering, official seal, borders, and a genuine scannable QR code.
+    """
+    # A4 Dimensions at 150 DPI
+    width, height = 1240, 1754
+    img = Image.new("RGB", (width, height), (255, 255, 255))
+    draw = ImageDraw.Draw(img)
+
+    # Load Fonts
+    font_brand = get_unicode_font(34, bold=True)
+    font_subbrand = get_unicode_font(20, bold=False)
+    font_cert_title = get_unicode_font(28, bold=True)
+    font_label = get_unicode_font(20, bold=True)
+    font_val = get_unicode_font(20, bold=False)
+    font_val_bold = get_unicode_font(22, bold=True)
+    font_badge = get_unicode_font(16, bold=True)
+    font_disclaimer = get_unicode_font(13, bold=False)
+    font_disclaimer_bold = get_unicode_font(14, bold=True)
+
+    # Color Palette
+    navy = (18, 59, 99)
+    royal = (23, 105, 170)
+    saffron = (244, 163, 64)
+    teal = (22, 140, 131)
+    text_dark = (31, 41, 55)
+    text_muted = (100, 116, 139)
+    box_bg = (245, 248, 252)
+    border_color = (226, 232, 240)
+
+    # 1. Official Double Borders
+    draw.rectangle([(24, 24), (width - 24, height - 24)], outline=navy, width=5)
+    draw.rectangle([(34, 34), (width - 34, height - 34)], outline=saffron, width=2)
+    draw.rectangle([(42, 42), (width - 42, height - 42)], outline=(235, 240, 248), width=1)
+
+    # Corner Accents
+    for cx, cy in [(42, 42), (width - 42, 42), (42, height - 42), (width - 42, height - 42)]:
+        draw.rectangle([(cx - 8, cy - 8), (cx + 8, cy + 8)], fill=saffron)
+
+    # 2. Portal Header
+    logo_path = ROOT_DIR / "static" / "images" / "mp-suvidha-logo.png"
+    y_top = 70
+    if logo_path.is_file():
+        try:
+            logo_img = Image.open(logo_path).convert("RGBA")
+            # Resize proportionally to height 70
+            aspect = logo_img.width / logo_img.height
+            new_w = int(70 * aspect)
+            logo_resized = logo_img.resize((new_w, 70), Image.Resampling.LANCZOS)
+            # Create white background for pasting
+            temp_bg = Image.new("RGB", (new_w, 70), (255, 255, 255))
+            temp_bg.paste(logo_resized, (0, 0), logo_resized)
+            img.paste(temp_bg, ((width - new_w) // 2, y_top))
+            y_top += 85
+        except Exception:
+            pass
+
+    # Header Text
+    draw.text((width // 2, y_top), "मध्य प्रदेश डिजिटल सेवाएँ · MP SUVIDHA", font=font_brand, fill=navy, anchor="mm")
+    y_top += 38
+    draw.text((width // 2, y_top), "Citizen Services Demonstration & Delivery Portal", font=font_subbrand, fill=text_muted, anchor="mm")
+    y_top += 45
+
+    # Decorative Badge Strip
+    badge_text = "★ DEMONSTRATION RECORD · ई-सेवा सत्यापन प्रमाण पत्र ★"
+    draw.rectangle([(width // 2 - 320, y_top - 16), (width // 2 + 320, y_top + 16)], fill=(238, 244, 255), outline=royal, width=1)
+    draw.text((width // 2, y_top), badge_text, font=font_badge, fill=royal, anchor="mm")
+    y_top += 55
+
+    # Certificate Title
+    draw.text((width // 2, y_top), "डिजिटल सेवा प्रमाण पत्र / E-CERTIFICATE", font=font_cert_title, fill=navy, anchor="mm")
+    y_top += 30
+    draw.line([(width // 2 - 200, y_top), (width // 2 + 200, y_top)], fill=saffron, width=3)
+    y_top += 35
+
+    # Extract Certificate Metadata
+    applicant_name = cert.get("applicant_name") or "Aarav Sharma"
+    service_name = cert.get("service_name") or "Public Service"
+    department = cert.get("department") or "Public Administration"
+    cert_number = cert.get("number") or "MPS-CERT-2026-00000"
+    app_id = cert.get("application_id") or "MPS-2026-00000"
+    issue_date = cert.get("issue_date") or "2026-11-12"
+    status = cert.get("status") or "Valid"
+
+    # 3. Main Data Card Box
+    box_x0, box_y0 = 80, y_top
+    box_x1, box_y1 = width - 80, y_top + 540
+    draw.rectangle([(box_x0, box_y0), (box_x1, box_y1)], fill=box_bg, outline=border_color, width=2)
+    # Accent top border
+    draw.line([(box_x0, box_y0), (box_x1, box_y0)], fill=royal, width=4)
+
+    fields = [
+        ("Certificate Number (प्रमाण पत्र क्रमांक):", cert_number, True, navy),
+        ("Application ID (आवेदन संदर्भ संख्या):", app_id, False, text_dark),
+        ("Issued To (आवेदक का नाम):", applicant_name, True, navy),
+        ("Service Name (सेवा का नाम):", service_name, True, royal),
+        ("Department (संबद्ध विभाग):", department, False, text_dark),
+        ("Date of Issue (जारी दिनांक):", issue_date, False, text_dark),
+        ("Verification Status (सत्यापन स्थिति):", f"{status} (Demo Registered / सत्यापित)", True, teal),
     ]
-    return generate_pdf_document("DEMONSTRATION CERTIFICATE OF SERVICE", "MADHYA PRADESH DIGITAL SERVICES · RECORD", entries)
+
+    cur_y = box_y0 + 35
+    for label, val, is_bold, color in fields:
+        draw.text((box_x0 + 40, cur_y), label, font=font_label, fill=text_muted)
+        val_font = font_val_bold if is_bold else font_val
+        draw.text((box_x0 + 430, cur_y), val, font=val_font, fill=color)
+        cur_y += 62
+        draw.line([(box_x0 + 30, cur_y - 12), (box_x1 - 30, cur_y - 12)], fill=(230, 235, 245), width=1)
+
+    y_bottom_section = box_y1 + 50
+
+    # 4. QR Code Generation (Genuine Verification Engine)
+    verify_url = f"http://127.0.0.1:5000/#verify?cert={cert_number}"
+    qr = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.constants.ERROR_CORRECT_M,
+        box_size=5,
+        border=2,
+    )
+    qr.add_data(verify_url)
+    qr.make(fit=True)
+    qr_img = qr.make_image(fill_color=navy, back_color="white").convert("RGB")
+
+    # Place QR Code on the Right
+    qr_x = width - 80 - qr_img.width
+    qr_y = y_bottom_section
+    img.paste(qr_img, (qr_x, qr_y))
+    draw.text((qr_x + qr_img.width // 2, qr_y + qr_img.height + 15), "Scan to Verify Online", font=font_badge, fill=navy, anchor="mm")
+    draw.text((qr_x + qr_img.width // 2, qr_y + qr_img.height + 35), "सत्यापन हेतु स्कैन करें", font=font_disclaimer, fill=text_muted, anchor="mm")
+
+    # 5. Security Watermark / Seal on the Left
+    seal_x = 80
+    seal_y = y_bottom_section + 10
+    draw.ellipse([(seal_x, seal_y), (seal_x + 160, seal_y + 160)], outline=navy, width=3)
+    draw.ellipse([(seal_x + 8, seal_y + 8), (seal_x + 152, seal_y + 152)], outline=saffron, width=2)
+    draw.text((seal_x + 80, seal_y + 55), "MP SUVIDHA", font=font_label, fill=navy, anchor="mm")
+    draw.text((seal_x + 80, seal_y + 85), "VERIFIED", font=font_label, fill=teal, anchor="mm")
+    draw.text((seal_x + 80, seal_y + 115), "DEMO SEAL", font=font_badge, fill=text_muted, anchor="mm")
+
+    # Signature / Authorized Text in Middle
+    mid_x = 280
+    draw.text((mid_x, y_bottom_section + 40), "Digitally Generated Demonstration Record", font=font_val_bold, fill=navy)
+    draw.text((mid_x, y_bottom_section + 70), "Government Process Simulation Framework", font=font_subbrand, fill=royal)
+    draw.text((mid_x, y_bottom_section + 100), f"Verification Reference: {cert_number}", font=font_badge, fill=text_muted)
+    draw.text((mid_x, y_bottom_section + 125), "Issuance Node: Bhopal Central Data Gateway", font=font_badge, fill=text_muted)
+
+    # 6. Official Demonstration Disclaimer (Both Languages)
+    disc_box_y0 = height - 240
+    disc_box_y1 = height - 55
+    draw.rectangle([(80, disc_box_y0), (width - 80, disc_box_y1)], fill=(255, 251, 235), outline=(254, 215, 170), width=1)
+    draw.line([(80, disc_box_y0), (width - 80, disc_box_y0)], fill=saffron, width=3)
+
+    draw.text((105, disc_box_y0 + 20), "LEGAL DISCLAIMER & NOTIFICATION / वैधानिक अस्वीकरण:", font=font_disclaimer_bold, fill=(180, 83, 9))
+    disc_en = (
+        "1. This certificate is an informational digital demonstration generated on the MP Suvidha portal to illustrate citizen service delivery. "
+        "It holds no statutory, legal, or administrative validity with the Government of Madhya Pradesh or any official department."
+    )
+    disc_hi = (
+        "२. यह प्रमाण पत्र नागरिक सेवा वितरण प्रणाली के तकनीकी प्रदर्शन हेतु एमपी सुविधा पोर्टल द्वारा जनरेट किया गया है। "
+        "यह मध्य प्रदेश शासन अथवा किसी सरकारी विभाग का आधिकारिक प्रमाण पत्र नहीं है और विधिक प्रयोजनों हेतु मान्य नहीं है।"
+    )
+    y_d = disc_box_y0 + 48
+    for line in textwrap.wrap(disc_en, width=105):
+        draw.text((105, y_d), line, font=font_disclaimer, fill=(120, 53, 15))
+        y_d += 20
+    y_d += 6
+    for line in textwrap.wrap(disc_hi, width=105):
+        draw.text((105, y_d), line, font=font_disclaimer, fill=(120, 53, 15))
+        y_d += 20
+
+    # Save to PDF buffer
+    buf = io.BytesIO()
+    img.save(buf, format="PDF", resolution=150.0)
+    return buf.getvalue()
 
 
 def build_evaluation_report_pdf(item: dict) -> bytes:
-    """Builds an internal E-Governance Portal Evaluation report."""
-    scores = item.get("scores", {})
-    entries = [
-        ("badge", "INTERNAL SYSTEM ASSESSMENT · E-GOVERNANCE PORTAL AUDIT REPORT"),
-        ("spacer", ""),
-        ("heading", "1. PORTAL INFORMATION & EVALUATION METADATA"),
-        ("body", f"Target Portal Name:     {item.get('portal_name', 'Local Portal')}"),
-        ("body", f"Portal URL / Access:    {item.get('portal_url') or 'Not provided'}"),
-        ("body", f"Governing Department:   {item.get('department') or 'Public Administration'}"),
-        ("body", f"Evaluation Date:        {item.get('evaluation_date', 'N/A')}"),
-        ("body", f"Evaluation Group:       {item.get('evaluator_group') or 'Audit Team'}"),
-        ("body", f"Lead Evaluator:         {item.get('evaluator') or 'System Reviewer'}"),
-        ("spacer", ""),
-        ("heading", "2. PORTAL OVERVIEW & OBJECTIVE"),
-        ("body", item.get("description") or "Comprehensive assessment of digital public service efficiency, navigation clarity, and citizen usability."),
-        ("spacer", ""),
-        ("heading", "3. EVALUATION SCORES (Scale: 1 = Needs Improvement, 5 = Excellent)"),
-    ]
+    """Generates an internal technical evaluation audit report PDF."""
+    width, height = 1240, 1754
+    img = Image.new("RGB", (width, height), (255, 255, 255))
+    draw = ImageDraw.Draw(img)
 
-    criteria = [
-        "User Friendliness", "Navigation and Interface", "Accessibility", "Service Availability",
-        "Application Process", "Application Tracking", "Information Accuracy", "Security and Privacy",
-        "Mobile Responsiveness", "Overall User Experience"
-    ]
-    total_score = 0
-    for crit in criteria:
-        val = int(scores.get(crit, 0))
-        total_score += val
-        stars = "* " * val + "- " * (5 - val)
-        entries.append(("body", f"- {crit.ljust(26)} :  {val} / 5   [{stars.strip()}]"))
+    font_title = get_unicode_font(26, bold=True)
+    font_head = get_unicode_font(18, bold=True)
+    font_body = get_unicode_font(15, bold=False)
+    font_mono = get_unicode_font(14, bold=True)
 
-    avg = round(total_score / len(criteria), 2)
-    entries.append(("subheading", f"Overall Evaluation Score: {avg} / 5.00 ({total_score} of 50 points)"))
-    entries.append(("spacer", ""))
+    navy = (18, 59, 99)
+    royal = (23, 105, 170)
+    text_dark = (31, 41, 55)
 
+    # Simple Header
+    draw.rectangle([(20, 20), (width - 20, height - 20)], outline=navy, width=3)
+    draw.text((width // 2, 60), "E-GOVERNANCE PORTAL AUDIT & TECHNICAL ASSESSMENT", font=font_title, fill=navy, anchor="mm")
+    draw.text((width // 2, 95), "MP Suvidha Internal System Evaluation Report", font=font_head, fill=royal, anchor="mm")
+    draw.line([(60, 120), (width - 60, 120)], fill=(200, 210, 225), width=2)
+
+    cur_y = 150
+    draw.text((60, cur_y), f"Portal Name: {item.get('portal_name', 'N/A')}", font=font_head, fill=text_dark)
+    cur_y += 30
+    draw.text((60, cur_y), f"Evaluation Date: {item.get('evaluation_date', 'N/A')}", font=font_body, fill=text_dark)
+    cur_y += 30
+    draw.text((60, cur_y), f"Evaluator: {item.get('evaluator', 'System Auditor')}", font=font_body, fill=text_dark)
+    cur_y += 40
+
+    draw.text((60, cur_y), "Evaluation Parameter Scores (Scale 1 to 5):", font=font_head, fill=navy)
+    cur_y += 30
+
+    scores = item.get("scores") or {}
+    for param, score in list(scores.items())[:10]:
+        val = int(score) if str(score).isdigit() else 0
+        stars = "★ " * val + "☆ " * (5 - val)
+        draw.text((80, cur_y), f"- {param.ljust(30)} : {val}/5   {stars}", font=font_mono, fill=text_dark)
+        cur_y += 26
+
+    cur_y += 25
     sections = [
-        ("4. PORTAL STRENGTHS", item.get("strengths") or "Clear categorization and service discovery."),
-        ("5. PORTAL LIMITATIONS", item.get("limitations") or "Multi-step navigation barriers."),
-        ("6. TECHNICAL ISSUES", item.get("technical_issues") or "Mobile responsiveness constraints."),
-        ("7. RECOMMENDATIONS", item.get("recommendations") or "Adopt unified digital design standards and instant tracking."),
+        ("Strengths:", item.get("strengths") or "High accessibility and fast service response."),
+        ("Limitations:", item.get("limitations") or "Multi-step navigation barriers in rural regions."),
+        ("Technical Recommendations:", item.get("recommendations") or "Expand mobile-first microservices and bilingual caching."),
     ]
+    for h_txt, b_txt in sections:
+        draw.text((60, cur_y), h_txt, font=font_head, fill=navy)
+        cur_y += 28
+        for line in textwrap.wrap(b_txt, width=95):
+            draw.text((80, cur_y), line, font=font_body, fill=text_dark)
+            cur_y += 24
+        cur_y += 15
 
-    for title, text in sections:
-        entries.append(("heading", title))
-        entries.append(("body", text))
-        entries.append(("spacer", ""))
-
-    return generate_pdf_document("PORTAL AUDIT REPORT", "DIGITAL SERVICES EVALUATION", entries)
+    buf = io.BytesIO()
+    img.save(buf, format="PDF", resolution=150.0)
+    return buf.getvalue()

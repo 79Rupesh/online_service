@@ -1,5 +1,5 @@
 /**
- * JanSeva Connect: Citizen and Stakeholder Feedback & Ratings Module
+ * MP Suvidha: Citizen and Stakeholder Feedback & Ratings Module
  */
 const Feedback = {
   selectedRating: 0,

@@ -65,7 +65,7 @@ const Auth = {
       State.token = result.token;
       State.user = result.user;
       localStorage.setItem("mpsuvidha_token", State.token);
-      localStorage.setItem("janseva_token", State.token);
+      localStorage.removeItem("janseva_token");
 
       closeModal("auth-modal");
       form.reset();
@@ -122,7 +122,7 @@ const Auth = {
   },
 
   async restoreSession() {
-    State.token = localStorage.getItem("mpsuvidha_token") || localStorage.getItem("janseva_token") || "";
+    State.token = localStorage.getItem("mpsuvidha_token") || "";
     if (!State.token) {
       this.updateUI();
       return;

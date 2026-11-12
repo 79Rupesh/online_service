@@ -98,6 +98,8 @@ def init_db() -> None:
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 application_id TEXT NOT NULL REFERENCES applications(id),
                 status TEXT NOT NULL,
+                previous_status TEXT NOT NULL DEFAULT '',
+                changed_by INTEGER REFERENCES users(id),
                 remarks TEXT NOT NULL DEFAULT '',
                 created_at TEXT NOT NULL
             );
@@ -202,6 +204,14 @@ def init_db() -> None:
             CREATE INDEX IF NOT EXISTS idx_apps_status ON applications(status);
             """
         )
+        # Dynamic schema migration for existing databases
+        cursor = db.execute("PRAGMA table_info(application_history)")
+        existing_cols = {row[1] for row in cursor.fetchall()}
+        if "changed_by" not in existing_cols:
+            db.execute("ALTER TABLE application_history ADD COLUMN changed_by INTEGER REFERENCES users(id)")
+        if "previous_status" not in existing_cols:
+            db.execute("ALTER TABLE application_history ADD COLUMN previous_status TEXT NOT NULL DEFAULT ''")
+
         seed_db(db)
 
 def seed_db(db: sqlite3.Connection) -> None:
@@ -504,24 +514,29 @@ def seed_db(db: sqlite3.Connection) -> None:
             )
         )
 
-    # Demo Accounts (Bilingual support with both @mpsuvidha.demo and backwards-compatible @janseva.demo)
-    demo_users = [
-        ("Aarav Sharma", "citizen@mpsuvidha.demo", "9876500001", "Citizen@123", "Arera Colony, Bhopal, Madhya Pradesh", "citizen", ""),
-        ("Priya Verma (Officer)", "officer@mpsuvidha.demo", "9876500002", "Officer@123", "Vallabh Bhawan, Bhopal, Madhya Pradesh", "officer", "Revenue Department"),
-        ("MP Suvidha Administrator", "admin@mpsuvidha.demo", "9876500003", "Admin@123", "Mantralaya, Bhopal, Madhya Pradesh", "admin", "General Administration"),
-        # Backward compatibility accounts
-        ("Aarav Sharma", "citizen@janseva.demo", "9876500001", "Citizen@123", "Arera Colony, Bhopal, Madhya Pradesh", "citizen", ""),
-        ("Priya Verma (Officer)", "officer@janseva.demo", "9876500002", "Officer@123", "Vallabh Bhawan, Bhopal, Madhya Pradesh", "officer", "Revenue Department"),
-        ("MP Suvidha Administrator", "admin@janseva.demo", "9876500003", "Admin@123", "Mantralaya, Bhopal, Madhya Pradesh", "admin", "General Administration"),
-    ]
-    for name, email, mobile, password, address, role, dept in demo_users:
-        db.execute(
-            """INSERT INTO users(name, email, mobile, password_hash, address, role, department, created_at)
-               VALUES(?, ?, ?, ?, ?, ?, ?, ?)
-               ON CONFLICT(email) DO UPDATE SET
-               name=excluded.name, mobile=excluded.mobile, address=excluded.address, role=excluded.role, department=excluded.department""",
-            (name, email, mobile, generate_password_hash(password), address, role, dept, now_iso()),
-        )
+    # Demo Accounts - only seed if users table is empty or SEED_DEMO_DATA=1
+    import os
+    users_count = db.execute("SELECT COUNT(*) FROM users").fetchone()[0]
+    should_seed_users = (users_count == 0) or (os.environ.get("SEED_DEMO_DATA") == "1")
+
+    # Clean up old legacy accounts
+    db.execute("DELETE FROM users WHERE email LIKE '%@janseva.demo'")
+
+    if should_seed_users:
+        demo_users = [
+            ("Aarav Sharma", "citizen@mpsuvidha.demo", "9876500001", "Citizen@123", "Arera Colony, Bhopal, Madhya Pradesh", "citizen", ""),
+            ("Priya Verma (Officer - Revenue)", "officer@mpsuvidha.demo", "9876500002", "Officer@123", "Vallabh Bhawan, Bhopal, Madhya Pradesh", "officer", "Revenue Department"),
+            ("Rajesh Patel (Officer - Municipal)", "officer_municipal@mpsuvidha.demo", "9876500004", "Officer@123", "Nagar Nigam, Bhopal, Madhya Pradesh", "officer", "Municipal Services"),
+            ("MP Suvidha Administrator", "admin@mpsuvidha.demo", "9876500003", "Admin@123", "Mantralaya, Bhopal, Madhya Pradesh", "admin", "General Administration"),
+        ]
+        for name, email, mobile, password, address, role, dept in demo_users:
+            db.execute(
+                """INSERT INTO users(name, email, mobile, password_hash, address, role, department, created_at)
+                   VALUES(?, ?, ?, ?, ?, ?, ?, ?)
+                   ON CONFLICT(email) DO UPDATE SET
+                   name=excluded.name, mobile=excluded.mobile, address=excluded.address, role=excluded.role, department=excluded.department""",
+                (name, email, mobile, generate_password_hash(password), address, role, dept, now_iso()),
+            )
 
     # Citizen Announcements (Professional, Bilingual, Non-Academic)
     if db.execute("SELECT COUNT(*) FROM announcements").fetchone()[0] == 0:

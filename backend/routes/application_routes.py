@@ -38,6 +38,20 @@ def build_application_view(db, row, include_private: bool = False) -> dict:
         item["applicant"] = {"name": applicant_name}
     return item
 
+def validate_file_signature(raw_bytes: bytes, ext: str) -> bool:
+    """Validates the file signature (magic bytes) to prevent disguised executables or malicious uploads."""
+    if not raw_bytes:
+        return False
+    
+    # Reject known dangerous executable headers
+    if raw_bytes.startswith(b"MZ") or raw_bytes.startswith(b"\x7fELF") or b"<?php" in raw_bytes[:100] or b"<script" in raw_bytes[:100].lower():
+        return False
+
+    signatures = Config.MAGIC_SIGNATURES.get(ext.lower(), [])
+    if not signatures:
+        return False
+    return any(raw_bytes.startswith(sig) for sig in signatures)
+
 @application_bp.post("")
 @auth_required("citizen", "admin", "officer")
 def submit_application():
@@ -71,6 +85,11 @@ def submit_application():
     if g.user["role"] == "citizen" and email != g.user["email"].lower():
         return error("Please use the email address associated with your logged-in account.")
 
+    # Service-specific data captures
+    service_details = data.get("service_details") or {}
+    if not isinstance(service_details, dict):
+        service_details = {}
+
     saved_documents = []
     for file in uploaded_files:
         filename = secure_filename(file.filename or "")
@@ -78,12 +97,17 @@ def submit_application():
             continue
         ext = filename.rsplit(".", 1)[-1].lower() if "." in filename else ""
         if ext not in Config.ALLOWED_EXTENSIONS:
-            return error(f"Invalid file format for '{filename}'. Allowed formats: PDF, JPG, PNG.")
+            return error(f"Invalid file format for '{filename}'. Allowed formats: PDF, JPG, PNG, DOC, DOCX.")
         raw_bytes = file.stream.read(Config.MAX_FILE_BYTES + 1)
         if len(raw_bytes) > Config.MAX_FILE_BYTES:
             return error(f"File '{filename}' exceeds maximum allowed size of 5 MB.")
         if not raw_bytes:
             continue
+
+        # Signature verification (Phase 3 D)
+        if not validate_file_signature(raw_bytes, ext):
+            return error(f"File '{filename}' content does not match its declared format ({ext.upper()}) or contains forbidden executable code.")
+
         stored_name = f"{uuid.uuid4().hex}.{ext}"
         (Config.UPLOAD_DIR / stored_name).write_bytes(raw_bytes)
         saved_documents.append({
@@ -99,7 +123,8 @@ def submit_application():
         "name": name,
         "email": email,
         "mobile": mobile,
-        "address": address[:300]
+        "address": address[:300],
+        "service_details": service_details
     }
 
     with connect_db() as db:
@@ -111,8 +136,8 @@ def submit_application():
              stamp, service["department"], stamp)
         )
         db.execute(
-            "INSERT INTO application_history (application_id, status, remarks, created_at) VALUES (?, 'Submitted', 'Application submitted successfully.', ?)",
-            (app_id, stamp)
+            "INSERT INTO application_history (application_id, status, previous_status, changed_by, remarks, created_at) VALUES (?, 'Submitted', '', ?, 'Application submitted successfully.', ?)",
+            (app_id, g.user["id"], stamp)
         )
         db.execute(
             "INSERT INTO notifications (user_id, title, body, created_at) VALUES (?, ?, ?, ?)",
@@ -173,6 +198,15 @@ def admin_applications_list():
 
     clauses = []
     params = []
+
+    # Officer Department Permission Boundary (Phase 4)
+    if g.user["role"] == "officer":
+        officer_dept = str(g.user.get("department") or "").strip()
+        if not officer_dept:
+            return error("Your officer profile does not have an assigned department. Contact an administrator.", 403)
+        clauses.append("department = ?")
+        params.append(officer_dept)
+
     if status:
         clauses.append("status = ?")
         params.append(status)
@@ -209,13 +243,20 @@ def update_application_status(app_id):
         if not row:
             return error("Application not found.", 404)
 
+        # Department-wise permission validation for officers (Phase 4)
+        if g.user["role"] == "officer":
+            officer_dept = str(g.user.get("department") or "").strip()
+            if not officer_dept or row["department"] != officer_dept:
+                return error(f"Access denied. You can only update applications for '{officer_dept or 'your assigned department'}'.", 403)
+
+        previous_status = row["status"]
         db.execute(
             "UPDATE applications SET status=?, officer_remarks=?, updated_at=? WHERE id=?",
             (new_status, remarks, stamp, app_id)
         )
         db.execute(
-            "INSERT INTO application_history (application_id, status, remarks, created_at) VALUES (?, ?, ?, ?)",
-            (app_id, new_status, remarks, stamp)
+            "INSERT INTO application_history (application_id, status, previous_status, changed_by, remarks, created_at) VALUES (?, ?, ?, ?, ?, ?)",
+            (app_id, new_status, previous_status, g.user["id"], remarks, stamp)
         )
         db.execute(
             "INSERT INTO notifications (user_id, title, body, created_at) VALUES (?, ?, ?, ?)",
@@ -249,23 +290,36 @@ def update_application_status(app_id):
 @application_bp.get("/<app_id>/documents/<stored_name>")
 @auth_required("admin", "officer", "citizen")
 def download_document(app_id, stored_name):
+    # Path traversal protection
+    clean_stored = secure_filename(stored_name)
+    if not clean_stored or ".." in stored_name or "/" in stored_name or "\\" in stored_name:
+        return error("Invalid file request path.", 400)
+
     with connect_db() as db:
         row = db.execute("SELECT * FROM applications WHERE id=?", (app_id,)).fetchone()
         if not row:
             return error("Application not found.", 404)
+
+        # Citizen can only view own documents
         if g.user["role"] == "citizen" and row["citizen_id"] != g.user["id"]:
             return error("You are not authorized to download this document.", 403)
+
+        # Officer can only view documents of own department
+        if g.user["role"] == "officer":
+            officer_dept = str(g.user.get("department") or "").strip()
+            if not officer_dept or row["department"] != officer_dept:
+                return error("Access denied. You cannot download documents for applications outside your department.", 403)
 
         try:
             documents = json.loads(row["documents"])
         except Exception:
             documents = []
 
-        found = next((d for d in documents if d.get("stored") == stored_name), None)
+        found = next((d for d in documents if d.get("stored") == clean_stored), None)
         if not found:
             return error("Document record not found.", 404)
 
-        file_path = Config.UPLOAD_DIR / stored_name
+        file_path = Config.UPLOAD_DIR / clean_stored
         if not file_path.is_file():
             return error("Document file is missing from local storage.", 404)
 

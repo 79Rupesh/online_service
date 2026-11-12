@@ -1,5 +1,5 @@
 /**
- * JanSeva Connect: Citizen, Officer, and Admin Dashboards & Analytics
+ * MP Suvidha: Citizen, Officer, and Admin Dashboards & Analytics
  */
 const Dashboard = {
   async loadPublicStats() {

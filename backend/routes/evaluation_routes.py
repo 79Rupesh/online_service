@@ -1,4 +1,4 @@
-"""College Syllabus Unit 5: E-Governance Portal Evaluation & Group Collaboration routes."""
+"""Internal E-Governance Portal Evaluation & Audit Module (Restricted Administration)."""
 import json
 import uuid
 from datetime import datetime
@@ -31,6 +31,7 @@ def format_evaluation_view(row) -> dict:
     return item
 
 @evaluation_bp.get("/evaluations")
+@auth_required("admin")
 def list_evaluations():
     q = request.args.get("q", "").strip()
     with connect_db() as db:
@@ -44,6 +45,7 @@ def list_evaluations():
     return jsonify([format_evaluation_view(r) for r in rows])
 
 @evaluation_bp.get("/evaluations/<eval_id>")
+@auth_required("admin")
 def get_evaluation(eval_id):
     with connect_db() as db:
         row = db.execute("SELECT * FROM evaluations WHERE id=?", (eval_id,)).fetchone()
@@ -151,6 +153,7 @@ def delete_evaluation(eval_id):
     return jsonify({"message": "Evaluation record deleted successfully."})
 
 @evaluation_bp.get("/evaluations/<eval_id>/report.pdf")
+@auth_required("admin")
 def get_evaluation_report(eval_id):
     with connect_db() as db:
         row = db.execute("SELECT * FROM evaluations WHERE id=?", (eval_id,)).fetchone()

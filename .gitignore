@@ -1,9 +1,28 @@
+# Virtual Environment
 .venv/
+.venv*/
+
+# Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
+*$py.class
+
+# Environment Variables
 .env
-instance/*.db
+.env.local
+
+# Databases & Runtime Instances
 instance/*.db-shm
 instance/*.db-wal
+backups/
+
+# Uploads & User Media
 uploads/*
 !uploads/.gitkeep
+
+# Logs and temporary files
+*.log
+scratch/
+tmp/
+.DS_Store
+Thumbs.db

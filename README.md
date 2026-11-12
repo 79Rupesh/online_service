@@ -78,15 +78,14 @@ Open your web browser and navigate to:
 
 ## 5. Demonstration Accounts
 
-The portal comes pre-seeded with ready-to-test demonstration accounts:
+The portal includes ready-to-test demonstration accounts:
 
-| Role | Email Address | Password | Description |
+| Role | Email Address | Password | Department / Description |
 | :--- | :--- | :--- | :--- |
-| **Citizen** | `citizen@mpsuvidha.demo` | `Citizen@123` | Submit applications, track status, download demo certificates |
-| **Officer** | `officer@mpsuvidha.demo` | `Officer@123` | Revenue Department officer: review documents, approve/reject |
-| **Administrator** | `admin@mpsuvidha.demo` | `Admin@123` | Manage services, categories, users, view analytics |
-
-*(Note: Prior credentials such as `citizen@janseva.demo` are also preserved for backward compatibility).*
+| **Citizen** | `citizen@mpsuvidha.demo` | `Citizen@123` | General Citizen: Submit applications, track status, download certificates |
+| **Officer (Revenue)** | `officer@mpsuvidha.demo` | `Officer@123` | Revenue Department: Department-restricted application review and approval |
+| **Officer (Municipal)** | `officer_municipal@mpsuvidha.demo` | `Officer@123` | Municipal Services: Department-restricted civic applications review |
+| **Administrator** | `admin@mpsuvidha.demo` | `Admin@123` | General Administration: Full governance, services, categories, users, analytics |
 
 ---
 
